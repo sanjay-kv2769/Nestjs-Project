@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, ValidationPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, ValidationPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Roles } from 'src/auth/decorators/roles.decorators';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 
 @Controller('users')
@@ -10,6 +12,8 @@ export class UsersController {
     constructor(private readonly UsersService: UsersService) { }
 
     @Get() //GET /users or /users?role=value
+    @Roles(['ADMIN','ENGINEER'])
+    @UseGuards(RolesGuard)
     findAll(@Query('role') role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
         return this.UsersService.findAll(role)
     }

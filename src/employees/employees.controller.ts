@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Ip } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Ip, UseGuards } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 // import { CreateEmployeeDto } from './dto/create-employee.dto';
 // import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Prisma } from '@prisma/client';
 import { SkipThrottle, Throttle, } from '@nestjs/throttler';
 import { MyLoggerService } from 'src/my-logger/my-logger.service';
+import { Roles } from 'src/auth/decorators/roles.decorators';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 
 
@@ -21,8 +23,10 @@ export class EmployeesController {
 
   // @SkipThrottle({ default: false })
   @Get()
+  @Roles(['CHILD'])
+  @UseGuards(RolesGuard)
   findAll(@Ip() ip: string, @Query('role') role?: "INTERN" | "ENGINEER" | "ADMIN") {
-    this.logger.log(`Request for all employees\t${ip}`,EmployeesController.name);
+    this.logger.log(`Request for all employees\t${ip}`, EmployeesController.name);
     return this.employeesService.findAll(role);
   }
 
